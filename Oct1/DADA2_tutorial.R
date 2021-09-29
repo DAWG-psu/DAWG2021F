@@ -116,5 +116,9 @@ library(phyloseq); packageVersion("phyloseq")
 ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows = FALSE),
                tax_table(taxa))
 ps
+saveRDS(ps, file = "my_phyloseq_object.rds")
 
 save.image("filename.Rdata")
+
+ps <- readRDS("my_phyloseq_object.rds")
+load("filename.Rdata")
