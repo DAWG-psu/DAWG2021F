@@ -8,6 +8,8 @@ list.files()
 ###'Session -> Set Working Directory -> Choose directory ..'
 
 ##Import data##
+##Go to 'terminal'
+##wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Oct1/DAWG_tutorial_table.csv
 table <- read.table("DAWG_tutorial_table.csv", sep = ",", header=T, row.names =1)
 rownames(table) #check row names of the table
 dim(table) #check dimension of the table
