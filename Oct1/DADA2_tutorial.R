@@ -15,12 +15,25 @@ colnames(table) #check column names of the table
 
 ##check the data structure and data type
 str(table) #check structure of the table
+table$SAMPLE_ID <- as.factor(table$SAMPLE_ID)
+table$Variable.B..group. <- as.factor(table$Variable.B..group.)
+table$Variable.A <- as.factor(table$Variable.A)
+str(table)
+
+##Examine data frame
+table[1,] ##Only showing first row
+table[1:2,] ##Showing first two row
+table[,1] ##First column
+table[,2:4] ##Second to fourth columns
+##IF your dataframe has 'header'
+table$SAMPLE_ID
 
 ##functions
-table <- read.table("DAWG_tutorial_table.csv", sep = ",", header=T, row.names =1)
 ?read.table
 
 ##Output file and export your data
+plot(table[,4:5])
+
 save.image("filename.Rdata")
 load("filename.Rdata")
 
