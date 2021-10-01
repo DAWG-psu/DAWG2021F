@@ -196,12 +196,14 @@ track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, 
 # If processing a single sample, remove the sapply calls: e.g. replace sapply(dadaFs, getN) with getN(dadaFs)
 colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
 rownames(track) <- sample.names
-head(track)
+track
 
 ##Let's download taxonomy database (SILVA v138.1 (updated at March 2021))
 ##wget https://zenodo.org/record/4587955/files/silva_nr99_v138.1_train_set.fa.gz
 ##wget https://zenodo.org/record/4587955/files/silva_species_assignment_v138.1.fa.gz
+##Check their website for more detail about the database (https://www.arb-silva.de)
 
+#This steps take some time depends on your computational power
 taxa <- assignTaxonomy(seqtab.nochim, "silva_nr99_v138.1_train_set.fa.gz", multithread=TRUE)
 taxa <- addSpecies(taxa, "silva_species_assignment_v138.1.fa.gz")
 
@@ -211,6 +213,7 @@ head(taxa.print)
 
 
 # Making phyloseq object for downstream analysis
+BiocManager::install("phyloseq")
 library(phyloseq); packageVersion("phyloseq")
 ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows = FALSE),
                tax_table(taxa))
