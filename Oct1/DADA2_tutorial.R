@@ -1,3 +1,37 @@
+### R studio basic tutorial ###
+list.files() #This command shows files in your working directory
+getwd()
+setwd("~/storage/work/tuc289/DAWG2021F")
+list.files()
+
+### You can also set up the working directory by clicking 
+###'Session -> Set Working Directory -> Choose directory ..'
+
+##Import data##
+table <- read.table("DAWG_tutorial_table.csv", sep = ",", header=T, row.names =1)
+rownames(table) #check row names of the table
+dim(table) #check dimension of the table
+colnames(table) #check column names of the table
+
+##check the data structure and data type
+str(table) #check structure of the table
+
+##functions
+table <- read.table("DAWG_tutorial_table.csv", sep = ",", header=T, row.names =1)
+?read.table
+
+##Output file and export your data
+save.image("filename.Rdata")
+load("filename.Rdata")
+
+## Save a single object to a file
+saveRDS(table, "table.rds")
+# Restore it under a different name
+table <- readRDS("table.rds")
+
+
+
+##DADA2 tutorial pipelines##
 ##Check DADA2 documents - https://benjjneb.github.io/dada2/index.html
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -116,9 +150,3 @@ library(phyloseq); packageVersion("phyloseq")
 ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows = FALSE),
                tax_table(taxa))
 ps
-saveRDS(ps, file = "my_phyloseq_object.rds")
-
-save.image("filename.Rdata")
-
-ps <- readRDS("my_phyloseq_object.rds")
-load("filename.Rdata")
