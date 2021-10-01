@@ -34,8 +34,6 @@ table$SAMPLE_ID
 ?read.table
 
 ##Output file and export your data
-plot(table[,4:5])
-
 save.image("filename.Rdata")
 load("filename.Rdata")
 
@@ -59,9 +57,9 @@ plot(table[,4:5])
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 BiocManager::install("dada2", update = TRUE)
-
+BiocManager::install("ShortRead")
 library(dada2); packageVersion("dada2")
-
+library(ShortRead)
 ##Let's get our tutorial dataset##
 
 ##Click Terminal -> type 'cd /storage/work/[your PSU id]/'
@@ -70,12 +68,13 @@ library(dada2); packageVersion("dada2")
 ##mkdir DAWG2021F
 ##cd DAWG2021F
 ##wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1uEfDchKzojpXuFXvhcsJ4wNmVlrhH-iH' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1uEfDchKzojpXuFXvhcsJ4wNmVlrhH-iH" -O fastq.zip && rm -rf /tmp/cookies.txt
-##unqip fastq.zip
+##unzip fastq.zip
 ##rm fastq.zip
+
 
 ##type 'pwd' and you will see '/storage/work/[your PSU ID]/DAWG2021F
 ##copy that!
-
+## ans paste here! : /storage/work/tuc289/DAWG2021F
 ##Go back to 'Console'
 
 path <- "/storage/work/tuc289/DAWG2021F"
@@ -104,7 +103,38 @@ plotQualityProfile(fnRs[1:2])
 # For example, if Q-score = 10 , meaning that prabability of incorrect base call is 1/10 (90% accuracy)
 # If Q-score = 30, meaning that error rate is 1 in 1000 (99.9% accuracy)
 
+#In gray-scale is a heat map of the frequency of each quality score at each base position. 
+#The mean quality score at each position is shown by the green line, 
+#and the quartiles of the quality score distribution by the orange lines. 
+#The red line shows the scaled proportion of reads that extend to at least that position 
+
 #From this plot, we need to decide the position for truncation (truncLen)
+
+#Check for primers ####
+FWD <- "GTGYCAGCMGCCGCGGTAA"
+REV <- "GGACTACNVGGGTWTCTAAT"
+
+allOrients <- function(primer) {
+  # Create all orientations of the input sequence
+  require(Biostrings)
+  dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
+  orients <- c(Forward = dna, Complement = complement(dna), Reverse = reverse(dna), 
+               RevComp = reverseComplement(dna))
+  return(sapply(orients, toString))  # Convert back to character vector
+}
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+FWD.orients
+
+primerHits <- function(primer, fn) {
+  # Counts number of reads in which the primer is found
+  nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+  return(sum(nhits > 0))
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs[[1]]))
 
 # Place filtered files in filtered/ subdirectory
 filtFs <- file.path(path, "filtered", paste0(sample.names, "_F_filt.fastq.gz"))
@@ -114,36 +144,49 @@ names(filtFs) <- sample.names
 names(filtRs) <- sample.names
 
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, truncLen=c(240,240),
-                     maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE,
-                     compress=TRUE, multithread=TRUE) # On Windows set multithread=FALSE
+                     maxN=0, maxEE=c(2,2), truncQ=2,
+                     compress=TRUE, multithread=TRUE,
+                     trimLeft = c(19, 20)) # On Windows set multithread=FALSE
 #maxN, maxEE, trunQ, rm.phix, truncLen .. what are they?
 head(out)
 
 #Alternatives: Zymo Research has recently developed a tool called Figaro that can help you choose DADA2 truncation length parameters: 
 #https://github.com/Zymo-Research/figaro#figaro
 
+#check if primers are removed
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = filtFs[[1]]), 
+      FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = filtRs[[1]]), 
+      REV.ForwardReads = sapply(REV.orients, primerHits, fn = filtFs[[1]]), 
+      REV.ReverseReads = sapply(REV.orients, primerHits, fn = filtRs[[1]]))
 
+#Learning error rates
 #It takes several minutes
 errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
 
+##Main function, 
+#The dada function takes as input dereplicated amplicon sequencing reads and returns the inferred composition of the sample (or samples). 
+#Put another way, dada removes all sequencing errors to reveal the members of the sequenced community. 
+
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
 dadaFs[[1]]
-
 dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
 dadaRs[[1]]
 
+#Merge forward and reverse reads
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
 head(mergers[[1]])
 
+#Making sequencetable
 seqtab <- makeSequenceTable(mergers)
 dim(seqtab)
 
 # Inspect distribution of sequence lengths
 table(nchar(getSequences(seqtab)))
 
+#Remove chimeric reads (A bimera is a two-parent chimera, in which the left side is made up of one parent sequence, and the right-side made up of a second parent sequence.)
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 dim(seqtab.nochim)
 sum(seqtab.nochim)/sum(seqtab)
@@ -173,4 +216,3 @@ ps <- phyloseq(otu_table(seqtab.nochim, taxa_are_rows = FALSE),
                tax_table(taxa))
 ps
 
-save.image("filename.Rdata")
