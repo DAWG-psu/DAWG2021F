@@ -107,6 +107,8 @@ errR <- learnErrors(filtRs, multithread=TRUE)
 plotErrors(errF, nominalQ=TRUE)
 plotErrors(errR, nominalQ=TRUE)
 
+# The dada function takes as input dereplicated amplicon sequencing reads and returns the inferred composition of the sample (or samples). 
+# Put another way, dada removes all sequencing errors to reveal the members of the sequenced community.
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
 dadaFs[[1]]
 
@@ -122,6 +124,7 @@ dim(seqtab)
 # Inspect distribution of sequence lengths
 table(nchar(getSequences(seqtab)))
 
+#Remove chimeric reads (A bimera is a two-parent chimera, in which the left side is made up of one parent sequence, and the right-side made up of a second parent sequence.)
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 dim(seqtab.nochim)
 sum(seqtab.nochim)/sum(seqtab)
