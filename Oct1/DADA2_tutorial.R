@@ -44,6 +44,13 @@ saveRDS(table, "table.rds")
 # Restore it under a different name
 table <- readRDS("table.rds")
 
+##Export your plot and table##
+write.csv(table, "table_output.csv")
+plot(table[,4:5])
+##plot -> export -> save as ...
+##There are other ways to export high resolution image files
+
+
 
 
 ##DADA2 tutorial pipelines##
