@@ -1,5 +1,5 @@
 # DAWG (Data Analysis Working Group) workshop series 
-## 2021 Fall semester, 2nd workshop "Diversity analysis & differential abundance test#
+## 2021 Fall semester, 2nd workshop "Diversity analysis & differential abundance test"
 
 ### Getting started
 
