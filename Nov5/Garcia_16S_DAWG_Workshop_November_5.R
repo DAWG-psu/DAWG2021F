@@ -66,8 +66,8 @@ ordered(sample_sums(ps.bac2))
 saveRDS(ps.bac2, "PS_DAWG_11_5_2021_.rds")
 
 #Read .RDS By using <-, we are restoring the RDS under the same name we used for our Phyloseq object.
-ps.bac <- readRDS("/Users/raymondo.garcia/Desktop/P. syringae/DAWG/PS_DAWG_11_5_2021_.rds")
-
+#ps.bac <- readRDS("/Users/raymondo.garcia/Desktop/P. syringae/DAWG/PS_DAWG_11_5_2021_.rds")
+ps.bac <- readRDS("/gpfs/scratch/[Your PSU ID]/DAWG2021F_2nd/ps_DAWG_2021_F.rds
 ######Now, let's start Filtering, Subsetting, and Performing Richnness, Ordination, and Multivariate analysis!
 
 #First, show available taxa ranks in the dataset and create a table with number of features for each taxa.
