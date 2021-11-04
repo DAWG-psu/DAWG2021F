@@ -1,6 +1,8 @@
 ###First, create a working directory to save scripts and data.
 getwd()
 setwd("/Users/raymondo.garcia")
+#in Roar 
+#setwd("/gpfs/scratch/DAWG2021F-2nd/")
 
 ####Install and Load Packages
 if (!requireNamespace("BiocManager", quietly = TRUE))
