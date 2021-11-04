@@ -26,20 +26,30 @@ Before the workshop, I would like to recommend you to either i) install R (>4.0.
 #### Download required file into your directory
 
 In this workshop, you will need two files
+
+ ``` 
   i) .r - R script file
   ii) .rds - R object file (phyloseq object)
+```
 
 to download those in your scratch directory, click "terminal" in your R studio (You can find this on your left bottom screen)
 then follow the lines below
 
 ```
 cd gpfs/scractch/[your PSU ID]/
-mkdir -p DAWG2021F_2nd
-cd DAWG2021F_2nd
+mkdir -p DAWG2021F-2nd
+cd DAWG2021F-2nd
 
-wget 
-wget
+wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Nov5/ps_DAWG_2021_F.rds
+wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Nov5/Garcia_16S_DAWG_Workshop_November_5.R
 ```
 
-Now, let's go back to "console"
+Now, let's go back to "console", and check the script
 
+Check where you can find the buttons
+![Screen Shot 2021-11-04 at 2 04 55 PM](https://user-images.githubusercontent.com/77017866/140395777-e4b38279-8e1d-4b62-9780-d6b769fcf260.png)
+
+Type this - you made the directory from the previous step (/gpfs/scractch/[your PSU ID]/DAWG2021F-2nd
+![Screen Shot 2021-11-04 at 2 09 08 PM](https://user-images.githubusercontent.com/77017866/140395696-369e8306-6e2a-4e84-a928-9d99ea85ea6e.png)
+
+# **Now we are ready to go!**
