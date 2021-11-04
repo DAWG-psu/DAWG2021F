@@ -36,7 +36,7 @@ to download those in your scratch directory, click "terminal" in your R studio (
 then follow the lines below
 
 ```
-cd gpfs/scractch/[your PSU ID]/
+cd gpfs/scratch/[your PSU ID]/
 mkdir -p DAWG2021F-2nd
 cd DAWG2021F-2nd
 
@@ -44,7 +44,7 @@ wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Nov5/ps_DAWG_2021_F.rds
 wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Nov5/Garcia_16S_DAWG_Workshop_November_5.R
 ```
 
-Now, let's go back to "console", and check the script
+Now, let's go back to "console", and open the script file (.r file)
 
 Check where you can find the buttons
 ![Screen Shot 2021-11-04 at 2 04 55 PM](https://user-images.githubusercontent.com/77017866/140395777-e4b38279-8e1d-4b62-9780-d6b769fcf260.png)
