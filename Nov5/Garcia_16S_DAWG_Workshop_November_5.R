@@ -2,7 +2,7 @@
 getwd()
 setwd("/Users/raymondo.garcia")
 #in Roar 
-#setwd("/gpfs/scratch/DAWG2021F-2nd/")
+#setwd("/gpfs/scratch/[your PSU ID]/DAWG2021F-2nd/")
 
 ####Install and Load Packages
 if (!requireNamespace("BiocManager", quietly = TRUE))
