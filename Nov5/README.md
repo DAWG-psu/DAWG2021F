@@ -52,10 +52,6 @@ Check where you can find the buttons
 Type this - you made the directory from the previous step (/gpfs/scractch/[your PSU ID]/DAWG2021F-2nd
 ![Screen Shot 2021-11-04 at 2 09 08 PM](https://user-images.githubusercontent.com/77017866/140395696-369e8306-6e2a-4e84-a928-9d99ea85ea6e.png)
 
-Finally, you can load .rds file into your environment by typing this in your console
-```
-ps.bac <- readRDS("/gpfs/scratch/[your PSU ID]/DAWG2021F-2nd/ps_DAWG_2021_F.rds
-```
 
 
 # **Now we are ready to go!**
