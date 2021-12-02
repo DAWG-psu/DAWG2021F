@@ -55,15 +55,35 @@ Random forest is based on decision tree.
 ### Tuning parameters
 #### empirical tuning
 
+![image](https://user-images.githubusercontent.com/77017866/144506862-f60da1c2-d7e0-42fa-9f2e-e76bce660270.png)
+
+
+
 ### Model evaluation
 #### Area under the curve
+![image](https://user-images.githubusercontent.com/77017866/144507018-0e66dad9-2467-48be-ac41-44bd80816362.png)
+
 #### Kappa statistics
+
+
 #### Accuracy
 
+### Cross validation VS hold-out validation
+#### Cross validation
+![image](https://user-images.githubusercontent.com/77017866/144508953-4bd49313-fe0a-440e-a789-82e38fadd910.png)
+
+#### Hold-out validation
+
 ### Variable importance measures
+
 #### Mean decrease accuracy
-#### Mean decrease Gini index
+
 #### Mean decrease AUC
+
+#### Mean decrease Gini index
+![image](https://user-images.githubusercontent.com/77017866/144508150-f376f9a7-e324-442e-8104-9d52e435265f.png)
+
+
 #### Permutational variable importance
 
 
@@ -195,3 +215,5 @@ varimp_plotting <- function(varImp_object){
   return(p)
   }
 ```
+
+
