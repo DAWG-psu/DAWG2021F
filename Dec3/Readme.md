@@ -9,7 +9,10 @@ cd DAWG2021F-2rd
 wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Dec3/DAWG_2021F_3rd.R
 wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Dec3/DAWG_2021F_3rd.RData
 ```
-
+Run below code in your 'console'
+```
+load("/gpfs/scratch/tuc289/DAWG2021F-3rd/DAWG_2021F_3rd.RData")
+```
 
 # DAWG 2021F 3rd workshop 
 ## Machine learning application on microbiome dataset
