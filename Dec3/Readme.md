@@ -2,7 +2,7 @@
 
 Run below code in your 'terminal'
 ```
-cd gpfs/scratch/[your PSU ID]/
+cd /gpfs/scratch/[your PSU ID]/
 mkdir -p DAWG2021F-3rd
 cd DAWG2021F-2rd
 
