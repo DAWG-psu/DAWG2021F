@@ -57,9 +57,20 @@ Random forest is based on decision tree.
 
 ![image](https://user-images.githubusercontent.com/77017866/144506862-f60da1c2-d7e0-42fa-9f2e-e76bce660270.png)
 
+![image](https://user-images.githubusercontent.com/77017866/144521135-1e62b6e0-c458-4786-970d-9e725550b4d9.png)
+
+
+#### mtry
+
+
+#### ntree
+
+
+#### nodesize
 
 
 ### Model evaluation
+
 #### Area under the curve
 ![image](https://user-images.githubusercontent.com/77017866/144507018-0e66dad9-2467-48be-ac41-44bd80816362.png)
 
@@ -82,10 +93,6 @@ Random forest is based on decision tree.
 
 #### Mean decrease Gini index
 ![image](https://user-images.githubusercontent.com/77017866/144508150-f376f9a7-e324-442e-8104-9d52e435265f.png)
-
-
-#### Permutational variable importance
-
 
 ## Rscript and annotation
 
@@ -191,15 +198,28 @@ trained.model.RF <- mlr::train(parameter_final, trainTask) # train the final mod
 learner.RF<-(getLearnerModel(trained.model.RF)) # get the trained forest in a format you can use with other packages
 ```
 
+* Alternatively, you can use RandomForest package directly after tuning - more flexibility
+```
+library(randomForest)
+randomforest_model <- randomForest(salmonella~., data = model_salmonella, 
+                                   mtry = tune.RF$x$mtry, ntree = tune.RF$x$ntree, nodesize = tune.RF$x$nodesize, 
+                                   importance=TRUE)
+
+```
+
 ### Variable importance measures
 
 1. Extract mean decrease accuracy and mean decrease gini
 
 ```
-varImp <- as.data.frame(importance(learner.RF, scale=T))
-varImp_gini <- varImp[order(varImp$MeanDecreaseGini, decreasing = T),]
-varImp_acc <- varImp[order(varImp$MeanDecreaseAccuracy, decreasing = T),]
+varImp_RF <- as.data.frame(importance(randomforest_model, scale=T))
+varImpPlot(randomforest_model)
+varImp_gini <- varImp_RF[order(varImp_RF$MeanDecreaseGini, decreasing = T),]
+varImp_acc <- varImp_RF[order(varImp_RF$MeanDecreaseAccuracy, decreasing = T),]
+```
 
+2. Create bar plot with top 15 most informative genus
+```
 varimp_plotting <- function(varImp_object){
   varImp_object <- varImp_object[1:15,]
   varImp_object[,5] <- varImp_object[,4]/sum(varImp_object[,4])
@@ -210,10 +230,41 @@ varimp_plotting <- function(varImp_object){
     ylab("") + 
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
           panel.background = element_blank(), axis.line = element_line(colour = "black"))+
-    theme(axis.text=element_text(size=6), axis.title=element_text(size=6),
-          text=element_text(size=6, color="black"))
+    theme(axis.text=element_text(size=10), axis.title=element_text(size=10),
+          text=element_text(size=10, color="black"))
   return(p)
-  }
+}
+varimp_plotting(varImp_gini)
+varimp_plotting(varImp_acc)
 ```
+![image](https://user-images.githubusercontent.com/77017866/144528820-93f99f75-b1b2-4e25-902e-3bd6d4dbf071.png)
+
+This looks good. We identified a few genus that is associated with presence of Salmonella in the sample. However, it is not the end. We have to check a few things before we decided to make a conclusion
+
+### Check the results
+
+1. Correlation between genus
+
+If those genus are co-occurence each other, we cannot strongly state that each genus were assocated with either Salmoneela or just other genus
+
+```
+varimp_15 <- varImp_gini[1:15,]
+genus_rf <- model_salmonella[, rownames(varimp_15)]
+corr <- cor(genus_rf)
+library(corrplot)
+corrplot(corr, method="color", order = "AOE", type="lower", tl.col = "black", cl.ratio =0.2, tl.srt =45, tl.cex =0.7)
+```
+![image](https://user-images.githubusercontent.com/77017866/144529368-e135b605-3473-44f7-bc12-6ca7ad160b80.png)
+
+Based on the plot, we can find a huge correlation between a number of genus in the sample, this type of data structure needs to be either addressed or mitigated
+
+2. taxa prevalence
+
+```
+boxplot(genus_rf, col=rainbow(20), las=2)
+```
+![image](https://user-images.githubusercontent.com/77017866/144530920-36a03ad6-22ca-4f19-ae0c-a7290d7e9436.png)
+
+
 
 
