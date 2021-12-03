@@ -245,8 +245,6 @@ This looks good. We identified a few genus that is associated with presence of S
 
 1. Correlation between genus
 
-If those genus are co-occurence each other, we cannot strongly state that each genus were assocated with either Salmoneela or just other genus
-
 ```
 varimp_15 <- varImp_gini[1:15,]
 genus_rf <- model_salmonella[, rownames(varimp_15)]
@@ -256,7 +254,7 @@ corrplot(corr, method="color", order = "AOE", type="lower", tl.col = "black", cl
 ```
 ![image](https://user-images.githubusercontent.com/77017866/144529368-e135b605-3473-44f7-bc12-6ca7ad160b80.png)
 
-Based on the plot, we can find a huge correlation between a number of genus in the sample, this type of data structure needs to be either addressed or mitigated
+Based on the plot, we can find a huge correlation between a number of genus in the sample, this type of data structure needs to be either addressed or mitigated. One possible solution is to choose different machine learning algorithm, which can take care of the collinearity problem (i.e., conditional random forest)
 
 2. taxa prevalence
 
