@@ -1,3 +1,16 @@
+### getting started .. ##
+
+Run below code in your 'terminal'
+```
+cd gpfs/scratch/[your PSU ID]/
+mkdir -p DAWG2021F-3rd
+cd DAWG2021F-2rd
+
+wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Dec3/DAWG_2021F_3rd.R
+wget https://github.com/DAWG-psu/DAWG2021F/raw/main/Dec3/DAWG_2021F_3rd.RData
+```
+
+
 # DAWG 2021F 3rd workshop 
 ## Machine learning application on microbiome dataset
 
