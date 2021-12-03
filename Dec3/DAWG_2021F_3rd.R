@@ -1,9 +1,6 @@
 ##making a function called 'taxa_level'. Very similar as tax_glom from phyloseq package
 taxa_level <- function(physeq,which_level){
   #enforce orientation
-  if(taxa_are_rows(physeq)){
-    physeq <- t(physeq)
-  }
   OTU <- otu_table(physeq)
   SAM <- sample_data(physeq)
   OTU_taxonomy <- tax_table(physeq)
@@ -42,7 +39,7 @@ phyloseq_genus <- taxa_level(phyloseq, "Genus")
 #Generating relative abundance table
 phyloseq_relative_abundance <- transform_sample_counts(phyloseq_genus, function(x) x/sum(x))
 taxa_are_rows(phyloseq_relative_abundance) ##Taxa should be in column
-phyloseq_relative_abundance <- load("phyloseq_object.rds")
+#phyloseq_relative_abundance <- load("phyloseq_object.rds")
 asv_relative_abundance <- otu_table(phyloseq_relative_abundance)
 metadata <- sample_data(phyloseq_relative_abundance) ## metadata
 metadata$salmonella 
@@ -66,6 +63,11 @@ model_salmonella[sapply(model_salmonella, is.character)] <- lapply(model_salmone
                                                              as.factor)
 
 #Tuning hyperparameter using mlr package
+install.packages("mlr")
+install.packages("party")
+install.packages("randomForest")
+install.packages("ggplot2")
+
 require(mlr)
 require(party)
 require(randomForest)
@@ -90,9 +92,6 @@ parameters <- makeParamSet(
   makeDiscreteParam("nodesize", values=c(5)) # sets max possible size of each tree - adapt range based on number of samples in dataset
 )
 print(parameters)
-
-
-
 
 #define evaluation and optimization algoritm
 set_cv <- makeResampleDesc("RepCV", reps = 3, folds=10) # 10-fold cross validation repeated 3 times
