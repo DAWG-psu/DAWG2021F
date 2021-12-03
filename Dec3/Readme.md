@@ -53,46 +53,69 @@ Random forest is based on decision tree.
 ## Machine learning procedure
 
 ### Tuning parameters
-#### empirical tuning
+#### empirical tuning (grid search vs random search)
 
 ![image](https://user-images.githubusercontent.com/77017866/144506862-f60da1c2-d7e0-42fa-9f2e-e76bce660270.png)
 
 ![image](https://user-images.githubusercontent.com/77017866/144521135-1e62b6e0-c458-4786-970d-9e725550b4d9.png)
 
 
-#### mtry
+**mtry**: Number of variables randomly sampled as candidates at each split
 
+**ntree**: Number of trees to grow
 
-#### ntree
-
-
-#### nodesize
-
+**nodesize**: Minimum number of sample to stop splitting
 
 ### Model evaluation
 
 #### Area under the curve
 ![image](https://user-images.githubusercontent.com/77017866/144507018-0e66dad9-2467-48be-ac41-44bd80816362.png)
 
+ROC curve is a performance measurement for the classification problem based on the model sensitivity and specificity. It is a probability curve and its area under the curve (AUC) represents the degree of separability. The ROC curve is plotted with TPR against the FPR where TPR is on the y-axis and FPR is on the x-axis.
+
 #### Kappa statistics
 
+Kappa is a chance-corrected measure of agreement (reliability of the classification). A mean for evaluating the prediction performance of classifiers
 
-#### Accuracy
+![image](https://user-images.githubusercontent.com/77017866/144539573-19c0042b-4217-4864-bfcd-e45e7b819ecc.png)
 
 ### Cross validation VS hold-out validation
+
+
 #### Cross validation
 ![image](https://user-images.githubusercontent.com/77017866/144508953-4bd49313-fe0a-440e-a789-82e38fadd910.png)
 
+Cross-validation or ‘k-fold cross-validation’ is when the dataset is randomly split up into ‘k’ groups. One of the groups is used as the test set and the rest are used as the training set. The model is trained on the training set and scored on the test set. Then the process is repeated until each unique group as been used as the test set.
+
+For example, for 4-fold cross validation, the dataset would be split into 5 groups, and the model would be trained and tested 5 separate times so each group would get a chance to be the test set. This can be seen in the graph below.
+
 #### Hold-out validation
+
+Hold-out is when you split up your dataset into a ‘train’ and ‘test’ set. The training set is what the model is trained on, and the test set is used to see how well that model performs on unseen data. A common split when using the hold-out method is using 80% of data for training and the remaining 20% of the data for testing.
+
+#### Hold-out VS Cross-validation
+
+Hold-out has its advantage of using completely independent dataset to validate the model. Also, it is computationally less intensive because it did not require multiple validations. However, Hold-out might subject to higher variance given the samller size of the data. Also, it is important to split training and testing data in similar ratio (but completely random)
+
+Cross validation is using entire dataset to evaluate the model. Also, it requires less number of sample than hold-out method. However, it is computationally intense and still have chance to have over-fitting problem.
 
 ### Variable importance measures
 
+Varialbe importance is indicating how much a given model uses the variable to make accurate predictions. In other words, how important the variable is for classification. Random forest R package has two default variable importance measures (i.e., Mean decrease accuracy, Mean decrease Gini), Mean decrease AUC is also widely used to calculate the variable importance. 
+
 #### Mean decrease accuracy
+
+The Mean Decrease Accuracy  expresses how much accuracy the model losses by excluding each variable. The more the accuracy suffers, the more important the variable is for the successful classification.
+
+#### Mean decrease Gini index
+
+The Mean Decrease in Gini coefficient is a measure of how each variable contributes to the homogeneity of the nodes and leaves in the resulting random forest. 
+
+![image](https://user-images.githubusercontent.com/77017866/144508150-f376f9a7-e324-442e-8104-9d52e435265f.png)
 
 #### Mean decrease AUC
 
-#### Mean decrease Gini index
-![image](https://user-images.githubusercontent.com/77017866/144508150-f376f9a7-e324-442e-8104-9d52e435265f.png)
+The Mean Decrease AUC is a measure of how much AUC the model losses by excluding each variable. 
 
 ## Rscript and annotation
 
@@ -105,25 +128,25 @@ phyloseq_genus <- taxa_level(phyloseq, "Genus")
 2. Generating relative abundance table of ASV table
 ```
 phyloseq_relative_abundance <- transform_sample_counts(phyloseq_genus, function(x) x/sum(x))
-if (taxa_are_rows(phyloseeq_relative_abundance) == TRUE) {
-    asv_relative_abundance <- otu_table(phyloseq_relative_abundance)
-} else {
-    asv_relative_abundance <- t(otu_table(phyloseq_relative_abundance)
-  }
-
+taxa_are_rows(phyloseq_relative_abundance) ##Taxa should be in column
+phyloseq_relative_abundance <- load("phyloseq_object.rds")
+asv_relative_abundance <- otu_table(phyloseq_relative_abundance)
 metadata <- sample_data(phyloseq_relative_abundance) ## metadata
+metadata$salmonella 
 ```
+
 3. Creating one table containing all the information we need for the classification
 ```
-model_salmonella <- as.data.frame(cbind(asv_relative_abundance, metadata))
+model_salmonella <- as.data.frame(cbind(asv_relative_abundance, "salmonella" = metadata$salmonella))
 model_salmonella$salmonella <- as.factor(model_salmonella$salmonella) # Change the feature as 'factor'
 ```
+
 4. Filter out unnecessary characters in taxon name
 ```
 names(model_salmonella) = gsub(pattern = " ", replace= "_", x = names(model_salmonella))
-names(model_salmonella)[names(dataset_rf) == 'f__'] <- 'f__unclassified'
+names(model_salmonella)[names(model_salmonella) == 'f__'] <- 'f__unclassified'
 names(model_salmonella) = gsub(pattern = "f__", replace= "", x = names(model_salmonella))
-names(model_salmonella)[names(dataset_rf) == 'g__'] <- 'g__unclassified'
+names(model_salmonella)[names(model_salmonella) == 'g__'] <- 'g__unclassified'
 names(model_salmonella) = gsub(pattern = "g__", replace= "", x = names(model_salmonella))
 names(model_salmonella) = gsub(pattern = '\\[', replace= "", x = names(model_salmonella))
 names(model_salmonella) = gsub(pattern = '\\]', replace= "", x = names(model_salmonella))
@@ -131,8 +154,9 @@ names(model_salmonella) = gsub(pattern = '\\/' , replace= "OR", x = names(model_
 names(model_salmonella) = gsub(pattern = '-' , replace = "_", x=names(model_salmonella))
 names(model_salmonella) = gsub(pattern = "\\(", replace = "_", x = names(model_salmonella))
 names(model_salmonella) = gsub(pattern = "\\)", replace = "_", x = names(model_salmonella))
-dataset_rf[sapply(model_salmonella, is.character)] <- lapply(dataset_rf[sapply(model_salmonella, is.character)], 
-                                         as.factor)
+model_salmonella[sapply(model_salmonella, is.character)] <- lapply(model_salmonella[sapply(model_salmonella, is.character)], 
+                                                             as.factor)
+
 ```
 
 ### Tuning parameters of random forest and making model using MLR package in R 
@@ -143,13 +167,15 @@ Parameters will be tuned in R based on the models' accuracy (AUC) and reliabilit
 require(mlr)
 require(party)
 require(randomForest)
+require(ggplot2)
+
 ```
 
 1. Making "task" (makeClassifTask)
 ```
-trainTask<- makeClassifTask(data = dataset_rf, # dataset
-                              target = "y", # name of the column in the data rame with Salmonella presence/absence data in it
-                              positive = "1" # how positive Salmonella samples are marked in that column)
+trainTask<- makeClassifTask(data = model_salmonella, # dataset
+                            target = "salmonella", # name of the column in the data rame with Salmonella presence/absence data in it
+                            positive = "1") # how positive Salmonella samples are marked in that column)
 ```
 
 2. Setting "parameters" (makeParamSet)
@@ -159,7 +185,7 @@ trainTask<- makeClassifTask(data = dataset_rf, # dataset
 ```
 parameters <- makeParamSet(
     makeDiscreteParam("ntree",values=c(501)), # always use an odd number of trees
-    makeDiscreteParam("mtry", values=seq(5,ncol(otu_table(object)), 50)), # this says test every 5th number - adapt range based on number of features in dataset
+    makeDiscreteParam("mtry", values=seq(5,ncol(otu_table(phyloseq_relative_abundance)), 50)), # this says test every 5th number - adapt range based on number of features in dataset
     makeDiscreteParam("nodesize", values=seq(5,40,10)) # sets max possible size of each tree - adapt range based on number of samples in dataset
     )
 print(parameters)
@@ -180,22 +206,24 @@ learner <- makeLearner("classif.randomForest", predict.type = 'prob') # set to p
 
 ```
 tune.RF <- tuneParams(learner = learner, 
-                         resampling = set_cv, 
-                         task = trainTask, 
-                         par.set = parameters, 
-                         control = control, 
-                         measures = list(auc, kappa)) # tune based on auc and kappa
+                      resampling = set_cv, 
+                      task = trainTask, 
+                      par.set = parameters, 
+                      control = control, 
+                      measures = list(auc, kappa)) # tune based on auc and kappa
+tune.RF
 ```
 
 6. Set final parameters for actual model
 ```
-parameter_final <- setHyperPars(leaner, par.vals = tune.RF$x)
+parameter_final <- setHyperPars(learner, par.vals = tune.RF$x)
 ```
 
 7. Making randomforest model
 ```
 trained.model.RF <- mlr::train(parameter_final, trainTask) # train the final model, see https://mlr.mlr-org.com/articles/tutorial/train.html
 learner.RF<-(getLearnerModel(trained.model.RF)) # get the trained forest in a format you can use with other packages
+learner.RF
 ```
 
 * Alternatively, you can use RandomForest package directly after tuning - more flexibility
@@ -234,9 +262,11 @@ varimp_plotting <- function(varImp_object){
           text=element_text(size=10, color="black"))
   return(p)
 }
+
 varimp_plotting(varImp_gini)
 varimp_plotting(varImp_acc)
 ```
+
 ![image](https://user-images.githubusercontent.com/77017866/144528820-93f99f75-b1b2-4e25-902e-3bd6d4dbf071.png)
 
 This looks good. We identified a few genus that is associated with presence of Salmonella in the sample. However, it is not the end. We have to check a few things before we decided to make a conclusion
